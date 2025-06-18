@@ -5,13 +5,34 @@ namespace App\Entity;
 use App\Enum\EtatType;
 use App\Enum\IncidentType;
 use App\Repository\SignalementsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use App\Entity\Evenements;
+
 #[ApiResource]
-#[ORM\Table(name: 'signalements')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER_ID', fields: ['user_id'])]
+#[ORM\Table(
+    name: 'signalements',
+    uniqueConstraints: [new ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER_ID', columns: ['user_id'])]
+)]
 #[ORM\Entity(repositoryClass: SignalementsRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['titre'=> 'partial', 'user_id.email' => 'exact', 'etat' => 'exact', 'tags' => 'exact'])]
+#[Post(security: 'is_granted("ROLE_USER")')]
+#[GetCollection]
+#[Get]
+#[Put(security: 'is_granted("ROLE_USER")')]
+#[Patch(security: 'is_granted("ROLE_USER")')]
+#[Delete(security: 'is_granted("ROLE_ADMIN")')]
 class Signalements
 {
     #[ORM\Id]
@@ -31,15 +52,26 @@ class Signalements
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'latitude')]
+    #[ORM\ManyToOne(inversedBy: 'signalements')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?User $user = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
+
+    /**
+     * @var Collection<int, Evenements>
+     */
+    #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'signalement_id')]
+    private Collection $evenements;
+
+    public function __construct()
+    {
+        $this->evenements = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -94,15 +126,14 @@ class Signalements
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUser(?User $user): static
     {
-        $this->user_id = $user_id;
-
+        $this->user = $user;
         return $this;
     }
 
@@ -126,6 +157,36 @@ class Signalements
     public function setLongitude(?string $longitude): static
     {
         $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evenements>
+     */
+    public function getEvenements(): Collection
+    {
+        return $this->evenements;
+    }
+
+    public function addEvenement(Evenements $evenement): static
+    {
+        if (!$this->evenements->contains($evenement)) {
+            $this->evenements->add($evenement);
+            $evenement->setSignalementId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenement(Evenements $evenement): static
+    {
+        if ($this->evenements->removeElement($evenement)) {
+            // set the owning side to null (unless already changed)
+            if ($evenement->getSignalementId() === $this) {
+                $evenement->setSignalementId(null);
+            }
+        }
 
         return $this;
     }

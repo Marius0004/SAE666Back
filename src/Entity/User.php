@@ -14,9 +14,33 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+// Dans User.php
+
+
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Signalements::class)]
+    private Collection $signalements;
+
+    public function __construct()
+    {
+        $this->signalements = new ArrayCollection();
+        $this->evenements = new ArrayCollection();
+    }
+    public function getSignalements(): Collection
+    {
+        return $this->signalements;
+    }
+    public function addSignalement(Signalements $signalement): static
+    {
+        if (!$this->signalements->contains($signalement)) {
+            $this->signalements[] = $signalement;
+            $signalement->setUser($this);
+        }
+
+        return $this;
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -36,6 +60,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Evenements>
+     */
+    #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'user_id')]
+    private Collection $evenements;
 
     
 
@@ -110,6 +140,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Evenements>
+     */
+    public function getEvenements(): Collection
+    {
+        return $this->evenements;
+    }
+
+    public function addEvenement(Evenements $evenement): static
+    {
+        if (!$this->evenements->contains($evenement)) {
+            $this->evenements->add($evenement);
+            $evenement->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenement(Evenements $evenement): static
+    {
+        if ($this->evenements->removeElement($evenement)) {
+            // set the owning side to null (unless already changed)
+            if ($evenement->getUserId() === $this) {
+                $evenement->setUserId(null);
+            }
+        }
+
+        return $this;
     }
 
 }
