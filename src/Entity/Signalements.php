@@ -62,10 +62,13 @@ class Signalements
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
+
+    #[ORM\Column(type:Types::TEXT, nullable: true)]
+    private $image;
     /**
      * @var Collection<int, Evenements>
      */
-    #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'signalement_id')]
+    #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'signalement')]
     private Collection $evenements;
 
     public function __construct()
@@ -158,6 +161,16 @@ class Signalements
     {
         $this->longitude = $longitude;
 
+        return $this;
+    }
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
         return $this;
     }
 

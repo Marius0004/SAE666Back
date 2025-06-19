@@ -1,12 +1,13 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
+parameters:
+    uploads_directory: '%kernel.project_dir%/public/uploads/images'
+
 framework:
-    secret: '%env(APP_SECRET)%'
-
-    # Note that the session will be started ONLY if you read or write from it.
+    secret: "%env(APP_SECRET)%"
     session: true
-
-    #esi: true
-    #fragments: true
+    assets:
+        packages:
+            uploads:
+                base_path: /uploads
 
 when@test:
     framework:

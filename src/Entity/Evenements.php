@@ -4,8 +4,21 @@ namespace App\Entity;
 
 use App\Repository\EvenementsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\Entity\Signalements;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use App\Entity\User;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: EvenementsRepository::class)]
+#[Post(security: 'is_granted("ROLE_USER")')]
+#[ApiFilter(SearchFilter::class, properties: ['libelle' => 'partial', 'user_id.email' => 'exact', 'signalement_id.id' => 'exact'])]
+#[GetCollection]
+#[Get]
 class Evenements
 {
     #[ORM\Id]
@@ -17,10 +30,10 @@ class Evenements
     private ?string $libelle = null;
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
-    private ?Signalements $signalement_id = null;
+    private ?Signalements $signalement = null;
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
-    private ?User $user_id = null;
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -39,27 +52,29 @@ class Evenements
         return $this;
     }
 
-    public function getSignalementId(): ?Signalements
+    
+    public function getSignalement(): ?Signalements
     {
-        return $this->signalement_id;
+        return $this->signalement;
     }
 
-    public function setSignalementId(?Signalements $signalement_id): static
+   
+    public function setSignalement(?Signalements $signalement): static
     {
-        $this->signalement_id = $signalement_id;
-
+        $this->signalement = $signalement;
         return $this;
     }
 
-    public function getUserId(): ?User
+  
+
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUser(?User $user): static
     {
-        $this->user_id = $user_id;
-
+        $this->user = $user;
         return $this;
     }
 }
