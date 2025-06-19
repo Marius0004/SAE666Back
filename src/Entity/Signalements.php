@@ -23,10 +23,9 @@ use App\Entity\Evenements;
 #[ApiResource]
 #[ORM\Table(
     name: 'signalements',
-    uniqueConstraints: [new ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USER_ID', columns: ['user_id'])]
 )]
 #[ORM\Entity(repositoryClass: SignalementsRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['titre'=> 'partial', 'user_id.email' => 'exact', 'etat' => 'exact', 'tags' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['titre'=> 'partial', 'user.email' => 'exact', 'etat' => 'exact', 'tags' => 'exact'])]
 #[Post(security: 'is_granted("ROLE_USER")')]
 #[GetCollection]
 #[Get]

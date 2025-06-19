@@ -26,7 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->signalements = new ArrayCollection();
-        $this->evenements = new ArrayCollection();
+        // $this->evenements = new ArrayCollection();
     }
     public function getSignalements(): Collection
     {
@@ -64,8 +64,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Evenements>
      */
-    #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'user_id')]
-    private Collection $evenements;
+    // #[ORM\OneToMany(targetEntity: Evenements::class, mappedBy: 'user_id')]
+    // private Collection $evenements;
 
     
 
@@ -142,34 +142,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, Evenements>
-     */
-    public function getEvenements(): Collection
-    {
-        return $this->evenements;
-    }
+    // /**
+    //  * @return Collection<int, Evenements>
+    //  */
+    // public function getEvenements(): Collection
+    // {
+    //     return $this->evenements;
+    // }
 
-    public function addEvenement(Evenements $evenement): static
-    {
-        if (!$this->evenements->contains($evenement)) {
-            $this->evenements->add($evenement);
-            $evenement->setUserId($this);
-        }
+    // public function addEvenement(Evenements $evenement): static
+    // {
+    //     if (!$this->evenements->contains($evenement)) {
+    //         $this->evenements->add($evenement);
+    //         $evenement->setUserId($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeEvenement(Evenements $evenement): static
-    {
-        if ($this->evenements->removeElement($evenement)) {
-            // set the owning side to null (unless already changed)
-            if ($evenement->getUserId() === $this) {
-                $evenement->setUserId(null);
-            }
-        }
+    // public function removeEvenement(Evenements $evenement): static
+    // {
+    //     if ($this->evenements->removeElement($evenement)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($evenement->getUserId() === $this) {
+    //             $evenement->setUserId(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
 }

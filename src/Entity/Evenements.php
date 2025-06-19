@@ -16,7 +16,7 @@ use ApiPlatform\Metadata\GetCollection;
 #[ApiResource]
 #[ORM\Entity(repositoryClass: EvenementsRepository::class)]
 #[Post(security: 'is_granted("ROLE_USER")')]
-#[ApiFilter(SearchFilter::class, properties: ['libelle' => 'partial', 'user_id.email' => 'exact', 'signalement_id.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['libelle' => 'partial', 'user.email' => 'exact', 'signalement.id' => 'exact'])]
 #[GetCollection]
 #[Get]
 class Evenements
